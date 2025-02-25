@@ -2,19 +2,19 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const { Redis } = require('@upstash/redis');
+// const { Redis } = require('@upstash/redis');
 
 const app = express();
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
-const BASE_NEWS_API_URL = 'https://newsdata.io/api/1/latest';
+const BASE_NEWS_API_URL = process.env.NEWS_BASE_URL;
 
-const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_URL,
-    token: process.env.UPSTASH_REDIS_TOKEN,
-});
+// const redis = new Redis({
+//     url: process.env.UPSTASH_REDIS_URL,
+//     token: process.env.UPSTASH_REDIS_TOKEN,
+// });
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://news-app-client-alpha.vercel.app'],
     methods: ['GET'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -25,15 +25,14 @@ app.get('/', async (req, res) => {
     const newsKey = `${country}-${category}-news`;
 
     try {
-        console.log("parsedData")
         // Check if the news data is cached in Redis
-        const cachedData = await redis.get(newsKey);
-        if (cachedData) {
-            // const parsedData = JSON.parse(cachedData);
-            if (!nextPage) {
-                return res.json(cachedData); // Return cached data if no nextPage
-            }
-        }
+        // const cachedData = await redis.get(newsKey);
+        // if (cachedData) {
+        //     // const parsedData = JSON.parse(cachedData);
+        //     if (!nextPage) {
+        //         return res.json(cachedData); // Return cached data if no nextPage
+        //     }
+        // }
 
         const params = {
             apikey: NEWS_API_KEY,
@@ -50,10 +49,10 @@ app.get('/', async (req, res) => {
         }
 
         // Cache the results for 1 hour (3600 seconds)
-        await redis.setex(newsKey, 3600, JSON.stringify({
-            results: response.data.results,
-            nextPage: response.data.nextPage || null
-        }));
+        // await redis.setex(newsKey, 3600, JSON.stringify({
+        //     results: response.data.results,
+        //     nextPage: response.data.nextPage || null
+        // }));
 
         res.json({
             results: response.data.results,
