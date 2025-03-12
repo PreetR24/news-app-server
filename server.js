@@ -14,7 +14,7 @@ const BASE_NEWS_API_URL = process.env.NEWS_BASE_URL;
 // });
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://news-app-client-alpha.vercel.app'],
+    origin: ['http://localhost:3000', 'https://news-app-client-nine.vercel.app'],
     methods: ['GET'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
